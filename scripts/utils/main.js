@@ -1,157 +1,13 @@
 /**
  * Utility functions for managing tasks and modal interactions in the Kanban board application.
  */
-import { initialTasks } from "../../initialData.js";
+import { loadTasksFromStorage } from "./localStorage.js";
+import { clearExistingTasks, renderTasks } from "../ui/render.js";
+import { setupModalCloseHandler, setupSecondaryModalCloseHandler } from "../ui/modalHandlers.js";
+import { setupAddTaskFormHandler } from "../tasks/formUtils.js";
 
-// Load from localStorage or use initialData if storage is empty
-let tasks = JSON.parse(localStorage.getItem('tasks')) || initialTasks;
-
-/**
- * Creates a single task DOM element.
- * @param {Object} task - Task data object.
- * @param {string} task.title - Title of the task.
- * @param {number} task.id - Unique task ID.
- * @param {string} task.status - Status column: 'todo', 'doing', or 'done'.
- * @returns {HTMLElement} The created task div element.
- */
-function createTaskElement(task) {
-  const taskDiv = document.createElement("div");
-  taskDiv.className = "task-div";
-  taskDiv.textContent = task.title;
-  taskDiv.dataset.taskId = task.id;
-
-  taskDiv.addEventListener("click", () => {
-    openTaskModal(task);
-  });
-
-  return taskDiv;
-}
-
-/**
- * Finds the task container element based on task status.
- * @param {string} status - The task status ('todo', 'doing', or 'done').
- * @returns {HTMLElement|null} The container element, or null if not found.
- */
-function getTaskContainerByStatus(status) {
-  const column = document.querySelector(`.column-div[data-status="${status}"]`);
-  return column ? column.querySelector(".tasks-container") : null;
-}
-
-/**
- * Clears all existing task-divs from all task containers.
- */
-function clearExistingTasks() {
-  document.querySelectorAll(".tasks-container").forEach((container) => {
-    container.innerHTML = "";
-  });
-}
-
-/**
- * Renders all tasks from initial data to the UI.
- * Groups tasks by status and appends them to their respective columns.
- * @param {Array<Object>} tasks - Array of task objects.
- */
-function renderTasks(tasks) {
-  tasks.forEach((task) => {
-    const container = getTaskContainerByStatus(task.status);
-    if (container) {
-      const taskElement = createTaskElement(task);
-      container.appendChild(taskElement);
-    }
-  });
-}
-
-/**
- * Opens the modal dialog with pre-filled task details.
- * @param {Object} task - The task object to display in the modal.
- */
-function openTaskModal(task) {
-  const modal = document.getElementById("task-modal");
-  const titleInput = document.getElementById("task-title");
-  const descInput = document.getElementById("task-desc");
-  const statusSelect = document.getElementById("task-status");
-
-  titleInput.value = task.title;
-  descInput.value = task.description;
-  statusSelect.value = task.status;
-
-  modal.showModal();
-}
-
-/**
- * Sets up modal close behavior.
- * Attaches a click event listener to the close button that closes the modal when clicked.
- * @param {void}
- * @returns {void}
- */
-function setupModalCloseHandler() {
-  const modal = document.getElementById("task-modal");
-  const closeBtn = document.getElementById("close-modal-btn");
-
-  closeBtn.addEventListener("click", () => {
-    modal.close();
-  });
-}
-
-/**
- * Sets up the event handlers for opening and closing the secondary "Add Task" modal.
- * Handles the click events for both the "Add New Task" button and the "Cancel" button within the modal.
- * @param {void}
- * @returns {void}
- */
-function setupSecondaryModalCloseHandler() {
-    const modal = document.getElementById("add-task-modal");
-    const openBtn = document.getElementById("add-new-task-btn");
-    const closeBtn = document.getElementById("cancel-add-btn");
-    openBtn.addEventListener("click", () => {
-        modal.showModal();
-    });
-    closeBtn.addEventListener("click", () => {
-        modal.close();
-    });
-}
-
-/**
- * Saves the current tasks array to local storage.
- * Converts the tasks array to a JSON string before saving.
- * @returns {void}
- */
-function saveTasksToLocalStorage() {
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-}
-
-/**
- * Handles the submission of the "Add New Task" form.
- * Creates a new task object, updates the local tasks array, saves to local storage, and updates the UI.
- * @param {Event} e - The form submission event.
- * @returns {void}
- */
-function setupAddTaskFormHandler() {
-  const addTaskForm = document.getElementById("new-task-modal-window");
-  const addTaskModal = document.getElementById("add-task-modal");
-
-  addTaskForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const newTask = {
-      id: Date.now(),
-      title: document.getElementById("title-input").value,
-      description: document.getElementById("desc-input").value,
-      status: document.getElementById("select-status").value,
-    };
-
-    // Push to our local array for persistence
-    tasks.push(newTask);
-    saveTasksToLocalStorage(); // Save to Local Storage
-
-    const container = getTaskContainerByStatus(newTask.status);
-    if (container) {
-      container.appendChild(createTaskElement(newTask));
-      addTaskForm.reset();
-      addTaskModal.close();
-    }
-  });
-}
+// Load tasks from localStorage or use initialData if storage is empty
+let tasks = loadTasksFromStorage();
 
 /**
  * Initializes the task board and modal handlers.
@@ -164,7 +20,7 @@ function initTaskBoard() {
   renderTasks(tasks); // Use the dynamic 'tasks' variable
   setupModalCloseHandler();
   setupSecondaryModalCloseHandler();
-  setupAddTaskFormHandler();
+  setupAddTaskFormHandler(tasks);
 }
 
 // Wait until DOM is fully loaded

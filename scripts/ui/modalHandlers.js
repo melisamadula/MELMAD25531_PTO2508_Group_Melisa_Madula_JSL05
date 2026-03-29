@@ -1,28 +1,50 @@
 
 /**
- * Sets up the event handlers for closing modals.
+ * Opens the modal dialog with pre-filled task details.
+ * @param {Object} task - The task object to display in the modal.
  */
-export function setupModalCloseHandler() {
-    const modals = document.querySelectorAll(".modal");
-    modals.forEach((modal) => {
-        const closeButton = modal.querySelector(".close-button");
-        if (closeButton) {
-            closeButton.addEventListener("click", () => {
-                modal.style.display = "none";
-            });
-        }
-    });
+export function openTaskModal(task) {
+  const modal = document.getElementById("task-modal");
+  const titleInput = document.getElementById("task-title");
+  const descInput = document.getElementById("task-desc");
+  const statusSelect = document.getElementById("task-status");
+
+  titleInput.value = task.title;
+  descInput.value = task.description;
+  statusSelect.value = task.status;
+
+  modal.showModal();
 }
 
 /**
- * Sets up the event handler for opening the "New Task" modal when the corresponding button is clicked.
+ * Sets up modal close behavior.
+ * Attaches a click event listener to the close button that closes the modal when clicked.
+ * @param {void}
+ * @returns {void}
  */
-export function setupNewTaskModalHandler() {
-    const newTaskButton = document.getElementById("new-task-button");
-    const newTaskModal = document.getElementById("new-task-modal");
+export function setupModalCloseHandler() {
+  const modal = document.getElementById("task-modal");
+  const closeBtn = document.getElementById("close-modal-btn");
 
-    newTaskButton.addEventListener("click", () => {
-        newTaskModal.style.display = "block";
+  closeBtn.addEventListener("click", () => {
+    modal.close();
+  });
+}
+
+/**
+ * Sets up the event handlers for opening and closing the secondary "Add Task" modal.
+ * Handles the click events for both the "Add New Task" button and the "Cancel" button within the modal.
+ * @param {void}
+ * @returns {void}
+ */
+export function setupSecondaryModalCloseHandler() {
+    const modal = document.getElementById("add-task-modal");
+    const openBtn = document.getElementById("add-new-task-btn");
+    const closeBtn = document.getElementById("cancel-add-btn");
+    openBtn.addEventListener("click", () => {
+        modal.showModal();
     });
-
+    closeBtn.addEventListener("click", () => {
+        modal.close();
+    });
 }

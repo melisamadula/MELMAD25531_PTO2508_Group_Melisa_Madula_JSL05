@@ -5,9 +5,9 @@ import { createTaskElement } from "./taskElement.js";
  * @param {string} status - The status of the task (e.g., "To Do", "In Progress", "Done").
  * @returns {HTMLElement} The corresponding task container element.
  */
-function getTaskContainerByStatus(status) {
+export function getTaskContainerByStatus(status) {
     const column = document.querySelector(`.column-div[data-status="${status}"]`);
-    return column ? column.querySelector(".task-container") : null;
+    return column ? column.querySelector(".tasks-container") : null;
 }
 
 /**
