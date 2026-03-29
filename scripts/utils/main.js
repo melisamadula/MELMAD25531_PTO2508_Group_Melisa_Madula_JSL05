@@ -3,6 +3,10 @@
  * Utility functions for managing tasks and modal interactions in the Kanban board application.
  */
 import { initialTasks } from "../../initialData.js";
+
+// Load from localStorage or use initialData if storage is empty
+let tasks = JSON.parse(localStorage.getItem('tasks')) || initialTasks;
+
 /**
  * Creates a single task DOM element.
  * @param {Object} task - Task data object.
@@ -103,14 +107,53 @@ function setupSecondaryModalCloseHandler() {
 }
 
 /**
+ * Saves the current tasks array to local storage.
+ */
+function saveTasksToLocalStorage() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+/**
+ * Handles the submission of the "Add New Task" form.
+ */
+function setupAddTaskFormHandler() {
+  const addTaskForm = document.getElementById("new-task-modal-window");
+  const addTaskModal = document.getElementById("add-task-modal");
+
+  addTaskForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const newTask = {
+      id: Date.now(),
+      title: document.getElementById("title-input").value,
+      description: document.getElementById("desc-input").value,
+      status: document.getElementById("select-status").value,
+    };
+
+    // Push to our local array for persistence
+    tasks.push(newTask);
+    saveTasksToLocalStorage(); // Save to Local Storage
+
+    const container = getTaskContainerByStatus(newTask.status);
+    if (container) {
+      container.appendChild(createTaskElement(newTask));
+      addTaskForm.reset();
+      addTaskModal.close();
+    }
+  });
+}
+
+/**
  * Initializes the task board and modal handlers.
  */
 function initTaskBoard() {
   clearExistingTasks();
-  renderTasks(initialTasks);
+  renderTasks(tasks); // Use the dynamic 'tasks' variable
   setupModalCloseHandler();
   setupSecondaryModalCloseHandler();
+  setupAddTaskFormHandler();
 }
 
 // Wait until DOM is fully loaded
 document.addEventListener("DOMContentLoaded", initTaskBoard);
+
