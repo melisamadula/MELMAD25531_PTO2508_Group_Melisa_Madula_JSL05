@@ -1,4 +1,3 @@
-
 /**
  * Utility functions for managing tasks and modal interactions in the Kanban board application.
  */
@@ -81,6 +80,9 @@ function openTaskModal(task) {
 
 /**
  * Sets up modal close behavior.
+ * Attaches a click event listener to the close button that closes the modal when clicked.
+ * @param {void}
+ * @returns {void}
  */
 function setupModalCloseHandler() {
   const modal = document.getElementById("task-modal");
@@ -93,6 +95,9 @@ function setupModalCloseHandler() {
 
 /**
  * Sets up the event handlers for opening and closing the secondary "Add Task" modal.
+ * Handles the click events for both the "Add New Task" button and the "Cancel" button within the modal.
+ * @param {void}
+ * @returns {void}
  */
 function setupSecondaryModalCloseHandler() {
     const modal = document.getElementById("add-task-modal");
@@ -108,6 +113,8 @@ function setupSecondaryModalCloseHandler() {
 
 /**
  * Saves the current tasks array to local storage.
+ * Converts the tasks array to a JSON string before saving.
+ * @returns {void}
  */
 function saveTasksToLocalStorage() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -115,6 +122,9 @@ function saveTasksToLocalStorage() {
 
 /**
  * Handles the submission of the "Add New Task" form.
+ * Creates a new task object, updates the local tasks array, saves to local storage, and updates the UI.
+ * @param {Event} e - The form submission event.
+ * @returns {void}
  */
 function setupAddTaskFormHandler() {
   const addTaskForm = document.getElementById("new-task-modal-window");
@@ -145,6 +155,9 @@ function setupAddTaskFormHandler() {
 
 /**
  * Initializes the task board and modal handlers.
+ * Clears existing tasks, renders tasks from the dynamic 'tasks' variable, and sets up modal event handlers.
+ * @param {Array<Object>} tasks - Array of task objects to render on initialization.
+ * @returns {void}
  */
 function initTaskBoard() {
   clearExistingTasks();
